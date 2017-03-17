@@ -1,0 +1,84 @@
+﻿<UserControl x:Class="Tronmedi.GUI.Views.ScanPage.SelectSlotView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Tronmedi.GUI.Views.ScanPage"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Snackbar.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <StackPanel x:Key="LoadingDialogContent" Margin="32">
+                <ProgressBar Style="{DynamicResource MaterialDesignCircularProgressBar}" HorizontalAlignment="Center" Margin="16" IsIndeterminate="True" Value="0" />
+                <TextBlock>Prescanning samples...</TextBlock>
+            </StackPanel>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <Grid>
+        <TextBlock Text="Please select the slots with samples loaded"
+                   Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top" />
+
+        <Border BorderThickness="1"
+                BorderBrush="{DynamicResource PrimaryHueLightBrush}"
+                MinHeight="400"
+                Margin="32,64">
+            <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="Slots"
+                              HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <Grid VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center">
+            <StackPanel Orientation="Horizontal"
+                        HorizontalAlignment="Center">
+
+                <Button x:Name="GoBack"
+                        Style="{DynamicResource MaterialDesignFlatButton}">
+                    <StackPanel Orientation="Horizontal">
+                        <materialDesign:PackIcon Kind="ArrowLeftBoldCircleOutline"
+                                                 Margin="0,0,8,0"
+                                                 VerticalAlignment="Center" />
+                        <TextBlock VerticalAlignment="Center">Back</TextBlock>
+
+                    </StackPanel>
+                </Button>
+
+                <Button x:Name="StartPrescan"
+                        Click="StartPrescan_Click"
+                        Margin="32,0,0,0">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center">Prescan</TextBlock>
+                        <materialDesign:PackIcon Kind="ArrowRightBoldCircleOutline"
+                                                 Margin="8,0,0,0"
+                                                 VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+
+            </StackPanel>
+
+            <materialDesign:Snackbar x:Name="NoSlotSelectedMessageSnackbar"
+                                     HorizontalAlignment="Center">
+                <materialDesign:SnackbarMessage ActionContent="OK"
+                                 ActionClick="NoSlotSelectedMessageSnackbar_ActionClick">
+                    Please select at least one slot.
+                </materialDesign:SnackbarMessage>
+            </materialDesign:Snackbar>
+        </Grid>
+    </Grid>
+</UserControl>
