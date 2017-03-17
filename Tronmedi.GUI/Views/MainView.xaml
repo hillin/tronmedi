@@ -1,0 +1,63 @@
+﻿<Window x:Class="Tronmedi.GUI.Views.MainView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Tronmedi.GUI"
+        mc:Ignorable="d"
+        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:viewModels="clr-namespace:Tronmedi.GUI.ViewModels"
+        TextElement.Foreground="{DynamicResource MaterialDesignBody}"
+        TextElement.FontWeight="Regular"
+        TextElement.FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" 
+        TextOptions.TextRenderingMode="Auto"        
+        Background="{DynamicResource MaterialDesignPaper}"
+        FontFamily="{DynamicResource MaterialDesignFont}"
+        Title="Tronmedi Scanner"
+        MinWidth="1280"
+        MinHeight="960">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Button.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.Shadows.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesignTheme.ToggleButton.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <materialDesign:DialogHost>
+        <materialDesign:DrawerHost IsLeftDrawerOpen="{Binding IsDrawerOpen}">
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <DockPanel MinWidth="212">
+                    <DockPanel DockPanel.Dock="Top">
+                        <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}" 
+                                      DockPanel.Dock="Right"
+                                      Margin="16"
+                                      IsChecked="{Binding IsDrawerOpen, Mode=TwoWay}" />
+
+                        <Button x:Name="GoHome" 
+                                Style="{DynamicResource MaterialDesignFlatButton}"
+                                HorizontalAlignment="Left">
+                            <materialDesign:PackIcon Kind="Home"
+                                                     Width="32" Height="32"
+                                                     VerticalAlignment="Center" />
+                        </Button>
+                    </DockPanel>
+                    <ListBox ItemsSource="{Binding RootActions}" Margin="0 16 0 16" SelectedIndex="0">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate DataType="viewModels:RootActionViewModel">
+                                <TextBlock Text="{Binding Title}" Margin="32 0 32 0" />
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </DockPanel>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+            <Grid>
+                <ContentControl x:Name="Content" />
+            </Grid>
+        </materialDesign:DrawerHost>
+    </materialDesign:DialogHost>
+</Window>

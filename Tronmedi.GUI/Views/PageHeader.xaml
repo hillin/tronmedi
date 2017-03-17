@@ -1,0 +1,29 @@
+﻿<UserControl x:Class="Tronmedi.GUI.Views.PageHeader"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:Tronmedi.GUI.Views"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <materialDesign:ColorZone Mode="PrimaryDark" 
+                              Padding="16"
+                              CornerRadius="3"
+                              materialDesign:ShadowAssist.ShadowDepth="Depth3"
+                              Margin="2,2,2,0">
+        <DockPanel>
+
+            <ToggleButton Style="{StaticResource MaterialDesignHamburgerToggleButton}"
+                          DockPanel.Dock="Left"
+                          VerticalAlignment="Top"
+                          Margin="0,0,8,0"
+                          IsChecked="{Binding IsDrawerOpen, Mode=TwoWay}" />
+
+            <TextBlock Text="{Binding PageTitle}"
+                       Style="{DynamicResource MaterialDesignHeadlineTextBlock}"
+                       VerticalAlignment="Center" />
+
+        </DockPanel>
+    </materialDesign:ColorZone>
+</UserControl>

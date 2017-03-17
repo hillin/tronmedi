@@ -1,0 +1,58 @@
+﻿<UserControl x:Class="Tronmedi.GUI.Views.ScanPage.CompletedView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Tronmedi.GUI.Views.ScanPage"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="400" d:DesignWidth="600">
+    <Grid>
+        <TextBlock Text="Scan Complete"
+                   Style="{DynamicResource MaterialDesignTitleTextBlock}"
+                   HorizontalAlignment="Center"
+                   VerticalAlignment="Top" />
+
+        <Border BorderThickness="1"
+                BorderBrush="{DynamicResource PrimaryHueLightBrush}"
+                MinHeight="400"
+                Margin="32,64">
+            <ScrollViewer VerticalScrollBarVisibility="Hidden"
+                          HorizontalScrollBarVisibility="Auto">
+                <ItemsControl x:Name="Slots"
+                              HorizontalAlignment="Center">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+            </ScrollViewer>
+        </Border>
+
+        <StackPanel Orientation="Horizontal"
+                    VerticalAlignment="Bottom"
+                    HorizontalAlignment="Center">
+            <Button x:Name="StartNewScan"
+                    Style="{DynamicResource MaterialDesignFlatButton}">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="PlusCircleOutline"
+                                             Margin="0,0,8,0"
+                                             VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center">Start New Scan</TextBlock>
+                </StackPanel>
+            </Button>
+
+            <Button x:Name="Close" 
+                    Style="{DynamicResource MaterialDesignFlatButton}"
+                    Margin="32,0,0,0">
+                <StackPanel Orientation="Horizontal">
+                    <materialDesign:PackIcon Kind="CloseBoxOutline"
+                                             Margin="0,0,8,0"
+                                             VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center">Close</TextBlock>
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</UserControl>
