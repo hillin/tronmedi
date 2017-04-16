@@ -16,7 +16,7 @@
         FontFamily="{DynamicResource MaterialDesignFont}"
         Title="Tronmedi Scanner"
         MinWidth="1280"
-        MinHeight="960">
+        MinHeight="800">
 
     <Window.Resources>
         <ResourceDictionary>
