@@ -59,25 +59,5 @@ namespace Tronmedi.Camera.Properties {
                 resourceCulture = value;
             }
         }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] DirectShowFacade {
-            get {
-                object obj = ResourceManager.GetObject("DirectShowFacade", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized resource of type System.Byte[].
-        /// </summary>
-        internal static byte[] DirectShowFacade64 {
-            get {
-                object obj = ResourceManager.GetObject("DirectShowFacade64", resourceCulture);
-                return ((byte[])(obj));
-            }
-        }
     }
 }

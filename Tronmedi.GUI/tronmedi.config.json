@@ -1,1 +1,9 @@
-{"CameraVid":"04f2","CameraPid":"a14b"}
+{
+  "CameraVid": "04f2",
+  "CameraPid": "a14b",
+  "StillImage": {
+    "Width": 2592,
+    "Height": 1944,
+    "ColorDepth": 24
+  }
+}

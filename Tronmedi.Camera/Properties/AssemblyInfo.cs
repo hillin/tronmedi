@@ -1,6 +1,4 @@
 ﻿using System.Reflection;
-using System.Resources;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -10,9 +8,9 @@ using System.Windows;
 [assembly: AssemblyTitle("CameraControl")]
 [assembly: AssemblyDescription("CameraControl")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("WebEye")]
+[assembly: AssemblyCompany("Tronmedi")]
 [assembly: AssemblyProduct("CameraControl")]
-[assembly: AssemblyCopyright("Copyright © WebEye 2016")]
+[assembly: AssemblyCopyright("Copyright © Tronmedi 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

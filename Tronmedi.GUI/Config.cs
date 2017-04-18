@@ -10,6 +10,13 @@ namespace Tronmedi.GUI
 {
 	class Config
 	{
+		public struct StillImageInfo
+		{
+			public int Width { get; set; }
+			public int Height{ get; set; }
+			public short ColorDepth { get; set; }
+		}
+
 		public const string Storage = "tronmedi.config.json";
 
 		public static readonly Config Instance;
@@ -36,5 +43,6 @@ namespace Tronmedi.GUI
 
 		public string CameraVid { get; set; }
 		public string CameraPid { get; set; }
+		public StillImageInfo StillImage { get; set; }
 	}
 }
