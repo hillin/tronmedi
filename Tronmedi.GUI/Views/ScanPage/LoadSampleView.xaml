@@ -16,31 +16,33 @@
                    HorizontalAlignment="Center"
                    VerticalAlignment="Top" />
 
-        <Viewbox Margin="32,64">
-            <Border BorderThickness="1"
-                    BorderBrush="{DynamicResource PrimaryHueLightBrush}"
-                    Width="640"
-                    Height="480">
-                <Grid>
+        <DockPanel Margin="32,64">
+            <local:CameraControllerView x:Name="CameraController" DockPanel.Dock="Right" />
+            <Viewbox>
+                <Border BorderThickness="1"
+                        BorderBrush="{DynamicResource PrimaryHueLightBrush}"
+                        Width="640"
+                        Height="480">
+                    <Grid>
 
-                    <TextBlock x:Name="CameraErrorText"
-                               TextAlignment="Center"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center" />
-                    <ProgressBar x:Name="CameraInitializationProgress"
-                                 Style="{StaticResource MaterialDesignCircularProgressBar}"
-                                 Width="48"
-                                 Height="48"
-                                 Value="0"
-                                 IsIndeterminate="True" />
-                    <Image />
+                        <TextBlock x:Name="CameraErrorText"
+                                   TextAlignment="Center"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
+                        <ProgressBar x:Name="CameraInitializationProgress"
+                                     Style="{StaticResource MaterialDesignCircularProgressBar}"
+                                     Width="48"
+                                     Height="48"
+                                     Value="0"
+                                     IsIndeterminate="True" />
+                        <Image />
 
-                    <camera:CameraControl x:Name="CameraControl" />
+                        <camera:CameraControl x:Name="CameraControl" />
 
-                </Grid>
-            </Border>
-        </Viewbox>
-
+                    </Grid>
+                </Border>
+            </Viewbox>
+        </DockPanel>
         <StackPanel Orientation="Horizontal"
                     VerticalAlignment="Bottom"
                     HorizontalAlignment="Center">

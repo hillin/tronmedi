@@ -14,7 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using DirectShowLib;
 using Tronmedi.Camera;
+using Tronmedi.GUI.ViewModels.ScanPage;
 
 namespace Tronmedi.GUI.Views.ScanPage
 {
@@ -68,10 +70,22 @@ namespace Tronmedi.GUI.Views.ScanPage
 					this.Dispatcher.BeginInvoke(new Action(() =>
 					{
 						device = this.CameraControl.GetVideoCaptureDevices().First(d => d.DevicePath == path);
+						var cameraPerformanceMode = CameraPerformanceMode.Normal;
 						this.CameraControl.StartCapture(device, Config.Instance.StillImage.Width, Config.Instance.StillImage.Height,
-							Config.Instance.StillImage.ColorDepth, CameraPerformanceMode.Normal);
+							Config.Instance.StillImage.ColorDepth, cameraPerformanceMode);
 						this.CameraErrorText.Text = string.Empty;
 						this.CameraControl.Visibility = Visibility.Visible;
+
+						if (cameraPerformanceMode == CameraPerformanceMode.Normal)
+						{
+							this.CameraController.DataContext = new CameraControllerViewModel(this.CameraControl);
+							this.CameraController.IsEnabled = true;
+						}
+						else
+						{
+							this.CameraController.IsEnabled = false;
+						}
+
 						//this.TestCapture();
 					}));
 
@@ -81,6 +95,7 @@ namespace Tronmedi.GUI.Views.ScanPage
 					this.Dispatcher.BeginInvoke(new Action(() =>
 					{
 						this.CameraErrorText.Text = $"Error: failed to initialze Tronmedi camera device.\n\n{e.Message}";
+						this.CameraController.IsEnabled = false;
 					}));
 				}
 			}

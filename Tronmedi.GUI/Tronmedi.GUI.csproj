@@ -77,8 +77,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Config.cs" />
+    <Compile Include="Design\BoolToVisibilityConverter.cs" />
     <Compile Include="Helpers\AirspaceOverlay.cs" />
     <Compile Include="Models\ScanSlotContext.cs" />
+    <Compile Include="ViewModels\ScanPage\CameraControllerViewModel.cs" />
     <Compile Include="ViewModels\Defaults.cs" />
     <Compile Include="ViewModels\HomePageViewModel.cs" />
     <Compile Include="ViewModels\PageViewModel.cs" />
@@ -111,6 +113,9 @@
     </Compile>
     <Compile Include="Views\BrowserPage\BrowserPageView.xaml.cs">
       <DependentUpon>BrowserPageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\ScanPage\CameraControllerView.xaml.cs">
+      <DependentUpon>CameraControllerView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\ScanPage\ScanningView.xaml.cs">
       <DependentUpon>ScanningView.xaml</DependentUpon>
@@ -170,6 +175,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\BrowserPage\BrowserPageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\ScanPage\CameraControllerView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

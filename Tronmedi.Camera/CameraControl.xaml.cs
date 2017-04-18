@@ -21,7 +21,7 @@ namespace Tronmedi.Camera
 
 		private void VideoWindow_SizeChanged(object sender, Size e)
 		{
-			_currentCamera?.UpdateWindowSize((int) e.Width, (int)e.Height);
+			_currentCamera?.UpdateWindowSize((int) e.Width, (int) e.Height);
 		}
 
 		public IEnumerable<DsDevice> GetVideoCaptureDevices()
@@ -39,13 +39,14 @@ namespace Tronmedi.Camera
 		[Browsable(false)]
 		public bool IsCapturing
 		{
-			get => (bool)GetValue(IsCapturingProperty);
+			get => (bool) GetValue(IsCapturingProperty);
 			private set => SetValue(IsCapturingPropertyKey, value);
 		}
 
 		private Camera _currentCamera;
 
-		public void StartCapture(DsDevice device, int width, int height, short colorDepth, CameraPerformanceMode mode = CameraPerformanceMode.Normal)
+		public void StartCapture(DsDevice device, int width, int height, short colorDepth,
+			CameraPerformanceMode mode = CameraPerformanceMode.Normal)
 		{
 			if (device == null)
 			{
@@ -97,6 +98,21 @@ namespace Tronmedi.Camera
 			}
 
 			return _currentCamera.Click();
+		}
+
+		public void SetProperty(CameraControlProperty property, CameraPropertyValue value)
+		{
+			_currentCamera.SetProperty(property, value);
+		}
+
+		public CameraPropertyRange GetPropertyRange(CameraControlProperty property)
+		{
+			return _currentCamera.GetPropertyRange(property);
+		}
+
+		public CameraPropertyValue GetProperty(CameraControlProperty property)
+		{
+			return _currentCamera.GetProperty(property);
 		}
 	}
 }

@@ -19,7 +19,7 @@ namespace Tronmedi.Camera
 		private IFilterGraph2 _filterGraph;
 
 		// Used to snap picture on Still pin
-		private IAMVideoControl _vidControl;
+		private IAMVideoControl _videoControl;
 		private IPin _pinStill;
 
 		/// <summary> so we can wait for the async job to finish </summary>
@@ -37,9 +37,12 @@ namespace Tronmedi.Camera
 
 		public int Stride { get; private set; }
 
+		private IAMCameraControl _cameraControl;
+
 #if DEBUG
 		// Allow you to "Connect to remote graph" from GraphEdit
 		DsROTEntry _rot;
+
 #endif
 
 		// Zero based device index and device params and output window
@@ -48,6 +51,7 @@ namespace Tronmedi.Camera
 			this.Mode = mode;
 			try
 			{
+
 				// Set up the capture graph
 				this.SetupGraph(device, width, height, depth, handle);
 
@@ -88,10 +92,10 @@ namespace Tronmedi.Camera
 				_wantOne = true;
 
 				// If we are using a still pin, ask for a picture
-				if (_vidControl != null)
+				if (_videoControl != null)
 				{
 					// Tell the camera to send an image
-					var hr = _vidControl.SetMode(_pinStill, VideoControlFlags.Trigger);
+					var hr = _videoControl.SetMode(_pinStill, VideoControlFlags.Trigger);
 					DsError.ThrowExceptionForHR(hr);
 				}
 
@@ -150,7 +154,8 @@ namespace Tronmedi.Camera
 						if (_pinStill != null)
 						{
 							// Get a control pointer (used in Click())
-							_vidControl = capFilter as IAMVideoControl;
+							_videoControl = capFilter as IAMVideoControl;
+							_cameraControl = capFilter as IAMCameraControl;
 
 							pCaptureOut = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
 
@@ -173,7 +178,8 @@ namespace Tronmedi.Camera
 							IPin pSmart = null;
 
 							// There is no still pin
-							this._vidControl = null;
+							_videoControl = null;
+							_cameraControl = null;
 
 							// Add a splitter
 							var iSmartTee = (IBaseFilter)new SmartTee();
@@ -242,7 +248,7 @@ namespace Tronmedi.Camera
 				hr = _filterGraph.AddFilter(baseGrabFlt, "Ds.NET Grabber");
 				DsError.ThrowExceptionForHR(hr);
 
-				if (_vidControl == null)
+				if (_videoControl == null)
 				{
 					// Connect the Still pin to the sample grabber
 					hr = _filterGraph.Connect(_pinStill, pSampleIn);
@@ -429,10 +435,10 @@ namespace Tronmedi.Camera
 				_filterGraph = null;
 			}
 
-			if (_vidControl != null)
+			if (_videoControl != null)
 			{
-				Marshal.ReleaseComObject(_vidControl);
-				_vidControl = null;
+				Marshal.ReleaseComObject(_videoControl);
+				_videoControl = null;
 			}
 
 			if (_pinStill != null)
@@ -477,5 +483,33 @@ namespace Tronmedi.Camera
 			ivw.put_Width(width);
 			ivw.put_Height(height);
 		}
+
+		public void SetProperty(CameraControlProperty property, CameraPropertyValue value)
+		{
+			if (this.Mode != CameraPerformanceMode.Normal)
+			{
+				throw new NotSupportedException("cannot set camera property under current mode");
+			}
+
+			_cameraControl.Set(property, value.Value, value.IsManual ? CameraControlFlags.Manual : CameraControlFlags.Auto);
+		}
+
+		public CameraPropertyRange GetPropertyRange(CameraControlProperty property)
+		{
+			if (this.Mode != CameraPerformanceMode.Normal)
+			{
+				throw new NotSupportedException("cannot get camera property range under current mode");
+			}
+
+			_cameraControl.GetRange(property, out var min, out var max, out var step, out var defaultValue, out var flags);
+			return new CameraPropertyRange(min, max, step, defaultValue, flags != CameraControlFlags.Auto);
+		}
+
+		public CameraPropertyValue GetProperty(CameraControlProperty property)
+		{
+			_cameraControl.Get(property, out var value, out var flags);
+			return new CameraPropertyValue(value, flags == CameraControlFlags.Manual);
+		}
+
 	}
 }
