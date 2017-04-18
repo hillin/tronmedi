@@ -9,9 +9,6 @@ using DirectShowLib;
 namespace Tronmedi.Camera
 {
 
-	/// <summary>
-	/// Interaction logic for CameraControl.xaml
-	/// </summary>
 	public partial class CameraControl
 	{
 		public CameraControl()
@@ -27,10 +24,6 @@ namespace Tronmedi.Camera
 			_currentCamera?.UpdateWindowSize((int) e.Width, (int)e.Height);
 		}
 
-		/// <summary>
-		/// Gets a list of available video capture devices.
-		/// </summary>
-		/// <exception cref="Win32Exception">Failed to load the DirectShow utilities dll.</exception>
 		public IEnumerable<DsDevice> GetVideoCaptureDevices()
 		{
 			return DsDevice.GetDevicesOfCat(FilterCategory.VideoInputDevice);
@@ -43,9 +36,6 @@ namespace Tronmedi.Camera
 		public static readonly DependencyProperty IsCapturingProperty
 			= IsCapturingPropertyKey.DependencyProperty;
 
-		/// <summary>
-		/// Gets a value indicating whether the control is capturing a video stream.
-		/// </summary>
 		[Browsable(false)]
 		public bool IsCapturing
 		{
@@ -55,14 +45,14 @@ namespace Tronmedi.Camera
 
 		private Camera _currentCamera;
 
-		public void StartCapture(DsDevice device, int width, int height, short colorDepth)
+		public void StartCapture(DsDevice device, int width, int height, short colorDepth, CameraPerformanceMode mode = CameraPerformanceMode.Normal)
 		{
 			if (device == null)
 			{
 				throw new ArgumentNullException();
 			}
 
-			_currentCamera = new Camera(device, width, height, colorDepth, this.VideoWindow.Handle);
+			_currentCamera = new Camera(device, width, height, colorDepth, this.VideoWindow.Handle, mode);
 			this.IsCapturing = true;
 		}
 

@@ -13,20 +13,19 @@ namespace Tronmedi.Camera
 	[SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
 	public class Camera : ISampleGrabberCB, IDisposable
 	{
-
-		
+		public CameraPerformanceMode Mode { get; }
 
 		/// <summary> graph builder interface. </summary>
-		private IFilterGraph2 _filterGraph = null;
+		private IFilterGraph2 _filterGraph;
 
 		// Used to snap picture on Still pin
-		private IAMVideoControl _vidControl = null;
+		private IAMVideoControl _vidControl;
 		private IPin _pinStill;
 
 		/// <summary> so we can wait for the async job to finish </summary>
 		private readonly ManualResetEvent _pictureReady;
 
-		private bool _wantOne = false;
+		private bool _wantOne;
 
 		/// <summary> buffer for bitmap data.  Always release by caller</summary>
 		private IntPtr _ipBuffer = IntPtr.Zero;
@@ -44,12 +43,13 @@ namespace Tronmedi.Camera
 #endif
 
 		// Zero based device index and device params and output window
-		public Camera(DsDevice device, int width, int height, short depth, IntPtr handle)
+		public Camera(DsDevice device, int width, int height, short depth, IntPtr handle, CameraPerformanceMode mode = CameraPerformanceMode.Normal)
 		{
+			this.Mode = mode;
 			try
 			{
 				// Set up the capture graph
-				SetupGraph(device, width, height, depth, handle);
+				this.SetupGraph(device, width, height, depth, handle);
 
 				// tell the callback to ignore new images
 				_pictureReady = new ManualResetEvent(false);
@@ -130,7 +130,7 @@ namespace Tronmedi.Camera
 			IPin pSampleIn = null;
 			IPin pRenderIn = null;
 
-			// Get the graphbuilder object
+			// Get the graph builder object
 			_filterGraph = (IFilterGraph2)new FilterGraph();
 
 			try
@@ -139,85 +139,88 @@ namespace Tronmedi.Camera
 				_rot = new DsROTEntry(_filterGraph);
 #endif
 				// add the video input device
-				IBaseFilter capFilter = null;
-				var hr = _filterGraph.AddSourceFilterForMoniker(dev.Mon, null, dev.Name, out capFilter);
+				var hr = _filterGraph.AddSourceFilterForMoniker(dev.Mon, null, dev.Name, out IBaseFilter capFilter);
 				DsError.ThrowExceptionForHR(hr);
 
-				// Find the still pin
-				_pinStill = DsFindPin.ByCategory(capFilter, PinCategory.Still, 0);
-
-				// Didn't find one.  Is there a preview pin?
-				if (_pinStill == null)
+				switch (this.Mode)
 				{
-					_pinStill = DsFindPin.ByCategory(capFilter, PinCategory.Preview, 0);
-				}
-
-				// Still haven't found one.  Need to put a splitter in so we have
-				// one stream to capture the bitmap from, and one to display.  Ok, we
-				// don't *have* to do it that way, but we are going to anyway.
-				if (_pinStill == null)
-				{
-					IPin pRaw = null;
-					IPin pSmart = null;
-
-					// There is no still pin
-					_vidControl = null;
-
-					// Add a splitter
-					var iSmartTee = (IBaseFilter)new SmartTee();
-
-					try
-					{
-						hr = _filterGraph.AddFilter(iSmartTee, "SmartTee");
-						DsError.ThrowExceptionForHR(hr);
-
-						// Find the find the capture pin from the video device and the
-						// input pin for the splitter, and connnect them
-						pRaw = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
-						pSmart = DsFindPin.ByDirection(iSmartTee, PinDirection.Input, 0);
-
-						hr = _filterGraph.Connect(pRaw, pSmart);
-						DsError.ThrowExceptionForHR(hr);
-
-						// Now set the capture and still pins (from the splitter)
-						_pinStill = DsFindPin.ByName(iSmartTee, "Preview");
-						pCaptureOut = DsFindPin.ByName(iSmartTee, "Capture");
-
-						// If any of the default config items are set, perform the config
-						// on the actual video device (rather than the splitter)
-						if (height + width + depth > 0)
+					case CameraPerformanceMode.Normal:
+						// Find the still pin
+						_pinStill = DsFindPin.ByCategory(capFilter, PinCategory.Still, 0);
+						if (_pinStill != null)
 						{
-							this.SetConfigParams(pRaw, width, height, depth);
-						}
-					}
-					finally
-					{
-						if (pRaw != null)
-						{
-							Marshal.ReleaseComObject(pRaw);
-						}
-						if (pRaw != pSmart && pSmart != null)
-						{
-							Marshal.ReleaseComObject(pSmart);
-						}
-						if (pRaw != iSmartTee)
-						{
-							Marshal.ReleaseComObject(iSmartTee);
-						}
-					}
-				}
-				else
-				{
-					// Get a control pointer (used in Click())
-					_vidControl = capFilter as IAMVideoControl;
+							// Get a control pointer (used in Click())
+							_vidControl = capFilter as IAMVideoControl;
 
-					pCaptureOut = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
+							pCaptureOut = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
 
-					// If any of the default config items are set
-					if (height + width + depth > 0)
-					{
-						this.SetConfigParams(_pinStill, width, height, depth);
-					}
+							// If any of the default config items are set
+							if (height + width + depth > 0)
+							{
+								this.SetConfigParams(_pinStill, width, height, depth);
+							}
+						}
+						else
+						{
+							throw new NotSupportedException("still pin not found, consider use FastCapture mode");
+						}
+						break;
+					case CameraPerformanceMode.FastCapture:
+						_pinStill = DsFindPin.ByCategory(capFilter, PinCategory.Preview, 0);
+						if (_pinStill == null)
+						{
+							IPin pRaw = null;
+							IPin pSmart = null;
+
+							// There is no still pin
+							this._vidControl = null;
+
+							// Add a splitter
+							var iSmartTee = (IBaseFilter)new SmartTee();
+
+							try
+							{
+								hr = this._filterGraph.AddFilter(iSmartTee, "SmartTee");
+								DsError.ThrowExceptionForHR(hr);
+
+								// Find the find the capture pin from the video device and the
+								// input pin for the splitter, and connect them
+								pRaw = DsFindPin.ByCategory(capFilter, PinCategory.Capture, 0);
+								pSmart = DsFindPin.ByDirection(iSmartTee, PinDirection.Input, 0);
+
+								hr = this._filterGraph.Connect(pRaw, pSmart);
+								DsError.ThrowExceptionForHR(hr);
+
+								// If any of the default config items are set, perform the config
+								// on the actual video device (rather than the splitter)
+								if (height + width + depth > 0)
+								{
+									this.SetConfigParams(pRaw, width, height, depth);
+								}
+
+								// Now set the capture and still pins (from the splitter)
+								this._pinStill = DsFindPin.ByName(iSmartTee, "Preview");
+								pCaptureOut = DsFindPin.ByName(iSmartTee, "Capture");
+							}
+							finally
+							{
+								if (pRaw != null)
+								{
+									Marshal.ReleaseComObject(pRaw);
+								}
+								if (pRaw != pSmart && pSmart != null)
+								{
+									Marshal.ReleaseComObject(pSmart);
+								}
+								if (pRaw != iSmartTee)
+								{
+									Marshal.ReleaseComObject(iSmartTee);
+								}
+							}
+						}
+						break;
+					default:
+						throw new ArgumentOutOfRangeException();
 				}
 
 				// Get the SampleGrabber interface
@@ -225,7 +228,7 @@ namespace Tronmedi.Camera
 
 				// Configure the sample grabber
 				var baseGrabFlt = sampGrabber as IBaseFilter;
-				ConfigureSampleGrabber(sampGrabber);
+				this.ConfigureSampleGrabber(sampGrabber);
 				pSampleIn = DsFindPin.ByDirection(baseGrabFlt, PinDirection.Input, 0);
 
 				// Get the default video renderer
@@ -261,8 +264,8 @@ namespace Tronmedi.Camera
 				}
 
 				// Learn the video properties
-				SaveSizeInfo(sampGrabber);
-				ConfigVideoWindow(handle);
+				this.SaveSizeInfo(sampGrabber);
+				this.ConfigVideoWindow(handle);
 
 				// Start the graph
 				var mediaCtrl = (IMediaControl)_filterGraph;
@@ -351,28 +354,24 @@ namespace Tronmedi.Camera
 
 			DsUtils.FreeAMMediaType(media);
 
-			// Configure the samplegrabber
+			// Configure the sample grabber
 			hr = sampGrabber.SetCallback(this, 1);
 			DsError.ThrowExceptionForHR(hr);
 		}
 
 		// Set the Framerate, and video size
-		private void SetConfigParams(IPin pStill, int width, int height, short depth)
+		private void SetConfigParams(IPin pin, int width, int height, short depth)
 		{
-			int hr;
-			AMMediaType media;
-			VideoInfoHeader v;
-
-			var videoStreamConfig = (IAMStreamConfig)pStill;
+			var videoStreamConfig = (IAMStreamConfig)pin;
 
 			// Get the existing format block
-			hr = videoStreamConfig.GetFormat(out media);
+			var hr = videoStreamConfig.GetFormat(out AMMediaType media);
 			DsError.ThrowExceptionForHR(hr);
 
 			try
 			{
-				// copy out the videoinfoheader
-				v = new VideoInfoHeader();
+				// copy out the video info header
+				var v = new VideoInfoHeader();
 				Marshal.PtrToStructure(media.formatPtr, v);
 
 				// if overriding the width, set the width

@@ -2,8 +2,8 @@
   "CameraVid": "04f2",
   "CameraPid": "a14b",
   "StillImage": {
-    "Width": 2592,
-    "Height": 1944,
+    "Width": 1600,
+    "Height": 1200 ,
     "ColorDepth": 24
   }
 }

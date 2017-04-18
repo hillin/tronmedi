@@ -69,11 +69,10 @@ namespace Tronmedi.GUI.Views.ScanPage
 					{
 						device = this.CameraControl.GetVideoCaptureDevices().First(d => d.DevicePath == path);
 						this.CameraControl.StartCapture(device, Config.Instance.StillImage.Width, Config.Instance.StillImage.Height,
-							Config.Instance.StillImage.ColorDepth);
+							Config.Instance.StillImage.ColorDepth, CameraPerformanceMode.Normal);
 						this.CameraErrorText.Text = string.Empty;
 						this.CameraControl.Visibility = Visibility.Visible;
-
-						this.Capture();
+						//this.TestCapture();
 					}));
 
 				}
@@ -92,12 +91,26 @@ namespace Tronmedi.GUI.Views.ScanPage
 			}));
 		}
 
-		private async void Capture()
+		private async void TestCapture()
+		{
+			for (var i = 0; i < 10; ++i)
+			{
+				await this.Capture();
+			}
+		}
+
+		private async Task Capture()
 		{
 			using (var fileStream = File.Create("d:\\1.png"))
 			{
+				var watch = new Stopwatch();
+				watch.Start();
+				var bitmapSource = await this.CameraControl.TakeStillPicture();
+				watch.Stop();
+				Debug.Print($"{watch.Elapsed} elapsed");
 				BitmapEncoder encoder = new PngBitmapEncoder();
-				encoder.Frames.Add(BitmapFrame.Create(await this.CameraControl.TakeStillPicture()));
+
+				encoder.Frames.Add(BitmapFrame.Create(bitmapSource));
 				encoder.Save(fileStream);
 			}
 		}

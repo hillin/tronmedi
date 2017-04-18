@@ -52,6 +52,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraPerformanceMode.cs" />
     <Compile Include="Win32API.cs" />
     <Page Include="CameraControl.xaml">
       <Generator>MSBuild:Compile</Generator>
